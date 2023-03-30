@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'fastfood',
-    'fastfood_auth.apps.Fastfood_authConfig',
+    'fastfood_auth',
+    'rest_framework.authtoken',
 ]
 
 
