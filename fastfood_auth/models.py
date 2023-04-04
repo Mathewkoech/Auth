@@ -2,8 +2,11 @@ from django.db import models
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from uuid import uuid4 as uuid
-# Create your models here.
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.utils import timezone
 
+# Create your models here.
 
 
 class MyUserManager(BaseUserManager):
@@ -22,6 +25,18 @@ class MyUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
+    def create_user(self,username,password,email = None,first_name = None,last_name = None,**extra_fields):
+        return self._create_user(username,email,password,first_name,last_name,**extra_fields)
+    
+    def create_superuser(username,email,password,first_name,last_name,**extra_fields):
+        extra_fields.setdefault("is_superuser", True)
+        
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("superuser must be is_superuser = True.")
+        return self._create_user(username,email,password,first_name,last_name,**extra_fields)
     
 class User(models.Model):
     id = models.UUIDField(default=uuid, primary_key=True)

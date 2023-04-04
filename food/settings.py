@@ -74,6 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'food.wsgi.application'
 
+AUTH_USER_MODEL = "fastfood_auth.user" 
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
