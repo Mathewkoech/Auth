@@ -74,7 +74,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'food.wsgi.application'
 
-AUTH_USER_MODEL = "fastfood_auth.user" 
+AUTH_USER_MODEL = "fastfood_auth.user"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
