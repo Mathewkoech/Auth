@@ -14,8 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from fastfood import urls as fastfood_urls
+from django.urls import path, include 
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.documentation import include_docs_urls
@@ -24,5 +23,5 @@ MEDIA_ROUTE = static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('fastfood.urls')),
+     path("api/v1/auth/", include("fastfood_auth.urls")),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

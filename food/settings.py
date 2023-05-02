@@ -38,10 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'fastfood',
-    'fastfood_auth',
+    "django.contrib.sites",
+    'fastfood_auth.apps.FastfoodAuthConfig',
+    'common.apps.CommonConfig',
     'rest_framework.authtoken',
+    'allauth.account',
+    'allauth'
+    'dj_rest_auth.registration',
 ]
+SITE_ID = 1
 
 
 MIDDLEWARE = [
@@ -77,9 +82,13 @@ WSGI_APPLICATION = 'food.wsgi.application'
 AUTH_USER_MODEL = "fastfood_auth.user"
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.AllowAny",
+    ),
 }
 
 # Database
@@ -87,14 +96,22 @@ REST_FRAMEWORK = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'fastfood',
+
+        'USER': 'postgres',
+
+        'PASSWORD': 'mathew11',
+
+        'HOST': 'localhost',
+
+        'PORT': 5432,
     }
 }
 
 
 # Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/4. 1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

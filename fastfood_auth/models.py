@@ -5,7 +5,10 @@ from uuid import uuid4 as uuid
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy as _
+from common.models import FlaggedModelMixin, TimeStampedModelMixin
+from django.contrib.postgres.fields import ArrayField
+from django.contrib.auth.models  import Permission
 
 class MyUserManager(BaseUserManager):
     use_in_migrations = True
@@ -36,6 +39,28 @@ class MyUserManager(BaseUserManager):
             raise ValueError("superuser must be is_superuser = True.")
         return self ._create_user(username,email,password,first_name,last_name,**extra_fields)
     
+class Role(TimeStampedModelMixin, FlaggedModelMixin):
+    name = models.CharField(_('name'), max_length=150)
+    permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_('permissions'),
+        blank=True,
+    )
+    permission_list = ArrayField(
+        models.CharField(max_length=100, blank=True, null=True), null=True, blank=True
+    )
+
+    class Meta:
+        db_table = "roles"
+        ordering = ["-created_at"]
+        unique_together = "name"
+
+
+class Permission(Permission):
+
+    class Meta:
+        proxy = True
+    
 class User(AbstractBaseUser):
     id = models.UUIDField(default=uuid, primary_key=True)
     first_name = models.CharField(("first name"), max_length=150, blank=True)
@@ -43,7 +68,6 @@ class User(AbstractBaseUser):
     username = models.CharField(("username"), max_length=150, blank=True, unique=True)
     email = models.EmailField(("email address"), blank=True, unique=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
-    pin = models.CharField(max_length=255, null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True)
     modified_by = models.ForeignKey(
@@ -51,6 +75,40 @@ class User(AbstractBaseUser):
         on_delete=models.SET_NULL,
         null=True,
         related_name="deleted_%(class)s",
+    )
+    AGENT = "agent"
+    CUSTOMER = "customer"
+    
+    USER_CHOICES = (
+       (AGENT, "agent"),
+        (CUSTOMER, "customer")
+    )
+    user_type = models.CharField(
+        ("user role"),
+        max_length=20,
+        blank=True,
+        choices=USER_CHOICES,
+        help_text=_(
+            "Designates the role of the user in the system - For Authorization"
+        ),
+        default=CUSTOMER
+    )
+    role = models.ForeignKey("Role", on_delete=models.DO_NOTHING, null=True)
+    is_staff = models.BooleanField(
+        _("staff status"),
+        default=False,
+        help_text=_(
+            "Designates whether the user can log into this admin site."
+        ),
+    )
+
+    is_active = models.BooleanField(
+        ("active"),
+        default=True,
+        help_text=_(
+            "Designates whether this user should be treated as active. "
+            "Unselect this instead of deleting accounts."
+        ),
     )
     objects = MyUserManager()
 
@@ -63,3 +121,49 @@ class User(AbstractBaseUser):
 
     _usable.boolean = True
     usable = property(_usable)
+
+    @property
+    def full_name(self):
+        return "{0} {1}".format(self.first_name, self.last_name)
+
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = "%s %s" % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        """Return the short name for the user."""
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        """Send an email to this user."""
+        send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def _is_employee(self):
+        return self.role == self.EMPLOYEE
+    _is_employee.boolean = True
+    is_employee = property(_is_employee)
+
+    def _is_customer(self):
+        return self.role == self.CUSTOMER
+    _is_customer.boolean = True
+    is_customer = property(_is_customer)
+
+    def _is_supplier(self):
+        return self.role == self.SUPPLIER
+    _is_supplier.boolean = True
+    is_supplier = property(_is_supplier)
+
+    def _has_pin(self):
+        if self.pin is None or self.pin == "":
+            return False
+        else:
+            return True
+    _has_pin.boolean = True
+    has_pin = property(_has_pin)
+
+    class Meta:
+        db_table = "users"
+        ordering = ["-date_joined"]

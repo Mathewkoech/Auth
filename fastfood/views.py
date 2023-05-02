@@ -8,13 +8,13 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 # Create your views here.
 
-@api_view(['GET'])
+# @api_view(['GET'])
 def getFood(request):
     food = Food.objects.all()
     serializer = FoodSerializer(food, many = True)
     return Response(serializer.data)
 
-@api_view(['POST'])
+# @api_view(['POST'])
 def postFood(request):
     serializer = FoodSerializer(data = request.data)
     if serializer.is_valid():

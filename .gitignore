@@ -1,5 +1,0 @@
-venv/
-.env
-lib/
-__pycache__/
-db.sqlite3/
