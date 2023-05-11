@@ -11,10 +11,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
-from fastfood_auth.decorators import permission_required
+# from fastfood_auth.decorators import permission_required
 from dj_rest_auth.registration.views import VerifyEmailView, RegisterView
 from common.views import BaseDetailView, BaseListView, GlobalListView
-from dj_rest_auth.app_settings import create_token, TokenSerializer
+# from dj_rest_auth.app_settings import create_token, TokenSerializer
 from fastfood_auth.serializers import (
     ContentTypeSerializer,
     GroupSerializer,

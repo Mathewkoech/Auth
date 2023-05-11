@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import user_passes_test
 from django.core.mail import send_mail
 
-def PermissionNeeded(perm,login_url = None,raise_exception = None):
+def Permission_required(perm,login_url = None,raise_exception = None):
 
     def check_perms(user):
         if isinstance(perm, str):

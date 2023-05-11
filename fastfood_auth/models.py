@@ -141,28 +141,16 @@ class User(AbstractBaseUser):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
-    def _is_employee(self):
-        return self.role == self.EMPLOYEE
-    _is_employee.boolean = True
-    is_employee = property(_is_employee)
+    def _is_agent(self):
+        return self.role == self.AGENT
+    _is_agent.boolean = True
+    is_employee = property(_is_agent)
 
     def _is_customer(self):
         return self.role == self.CUSTOMER
     _is_customer.boolean = True
     is_customer = property(_is_customer)
 
-    def _is_supplier(self):
-        return self.role == self.SUPPLIER
-    _is_supplier.boolean = True
-    is_supplier = property(_is_supplier)
-
-    def _has_pin(self):
-        if self.pin is None or self.pin == "":
-            return False
-        else:
-            return True
-    _has_pin.boolean = True
-    has_pin = property(_has_pin)
 
     class Meta:
         db_table = "users"

@@ -4,9 +4,9 @@ from email.headerregistry import ContentTypeHeader
 from common.serializers import BaseModelSerializer, BaseModelSerializerWithoutCommon
 from common.views import BaseListView, BaseDetailView
 from rest_framework import serializers
-from fastfood_auth.models import Role, User, Profile
+from fastfood_auth.models import Role, User
 from dj_rest_auth.serializers import PasswordResetSerializer
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy
 from datetime import datetime, date
 from rest_framework_simplejwt.settings import api_settings
 from calendar import timegm
@@ -15,65 +15,65 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers, exceptions
 UserModel = get_user_model()
 from django.db import transaction
-from fastfood_auth.forms import CustomPasswordResetForm
+# from fastfood_auth.forms import CustomPasswordResetForm
 from django.contrib.auth.models import Group, Permission
 
-class CustomPasswordChangeSerializer(serializers.Serializer):
-    old_password = serializers.CharField(max_length=128)
-    new_password1 = serializers.CharField(max_length=128)
-    new_password2 = serializers.CharField(max_length=128)
-    user_id = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+# class CustomPasswordChangeSerializer(serializers.Serializer):
+#     old_password = serializers.CharField(max_length=128)
+#     new_password1 = serializers.CharField(max_length=128)
+#     new_password2 = serializers.CharField(max_length=128)
+#     user_id = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
 
-    set_password_form_class = SetPasswordForm
+#     set_password_form_class = SetPasswordForm
 
-    set_password_form = None
+#     set_password_form = None
 
-    def __init__(self, *args, **kwargs):
-        print(self)
-        self.old_password_field_enabled = getattr(
-            settings, 'OLD_PASSWORD_FIELD_ENABLED', False,
-        )
-        self.logout_on_password_change = getattr(
-            settings, 'LOGOUT_ON_PASSWORD_CHANGE', False,
-        )
-        super().__init__(*args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         print(self)
+#         self.old_password_field_enabled = getattr(
+#             settings, 'OLD_PASSWORD_FIELD_ENABLED', False,
+#         )
+#         self.logout_on_password_change = getattr(
+#             settings, 'LOGOUT_ON_PASSWORD_CHANGE', False,
+#         )
+#         super().__init__(*args, **kwargs)
 
-        if not self.old_password_field_enabled:
-            self.fields.pop('old_password')
+#         if not self.old_password_field_enabled:
+#             self.fields.pop('old_password')
 
-        self.request = self.context.get('request')
+#         self.request = self.context.get('request')
 
-        self.user_id = self.request.data.get("user_id", None)
-        if self.user_id is not None:
-            user = User.objects.get(pk=self.user_id)
-        self.user = getattr(self.request, 'user', user)
+#         self.user_id = self.request.data.get("user_id", None)
+#         if self.user_id is not None:
+#             user = User.objects.get(pk=self.user_id)
+#         self.user = getattr(self.request, 'user', user)
 
-    def validate_old_password(self, value):
-        invalid_password_conditions = (
-            self.old_password_field_enabled,
-            self.user,
-            not self.user.check_password(value),
-        )
+#     def validate_old_password(self, value):
+#         invalid_password_conditions = (
+#             self.old_password_field_enabled,
+#             self.user,
+#             not self.user.check_password(value),
+#         )
 
-        if all(invalid_password_conditions):
-            err_msg = _('Your old password was entered incorrectly. Please enter it again.')
-            raise serializers.ValidationError(err_msg)
-        return value
+#         if all(invalid_password_conditions):
+#             err_msg = ('Your old password was entered incorrectly. Please enter it again.')
+#             raise serializers.ValidationError(err_msg)
+#         return value
 
-    def validate(self, attrs):
-        self.set_password_form = self.set_password_form_class(
-            user=self.user, data=attrs,
-        )
+#     def validate(self, attrs):
+#         self.set_password_form = self.set_password_form_class(
+#             user=self.user, data=attrs,
+#         )
 
-        if not self.set_password_form.is_valid():
-            raise serializers.ValidationError(self.set_password_form.errors)
-        return attrs
+#         if not self.set_password_form.is_valid():
+#             raise serializers.ValidationError(self.set_password_form.errors)
+#         return attrs
 
-    def save(self):
-        self.set_password_form.save()
-        if not self.logout_on_password_change:
-            from django.contrib.auth import update_session_auth_hash
-            update_session_auth_hash(self.request, self.user)
+#     def save(self):
+#         self.set_password_form.save()
+#         if not self.logout_on_password_change:
+#             from django.contrib.auth import update_session_auth_hash
+#             update_session_auth_hash(self.request, self.user)
 
 
 class PermissionsSerializer(BaseModelSerializerWithoutCommon):
@@ -139,15 +139,15 @@ class LeanRoleSerializer(BaseModelSerializer):
         model = Role
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    """
-    Serializer class for a user profile instance
-    """
-    # branch = AuthBranchSerializer(required=True)
+# class ProfileSerializer(serializers.ModelSerializer):
+#     """
+#     Serializer class for a user profile instance
+#     """
+#     # branch = AuthBranchSerializer(required=True)
 
-    class Meta:
-        fields = "__all__"
-        model = Profile
+#     class Meta:
+#         fields = "__all__"
+#         model = Profile
 
 class ReadProfileSerializer(serializers.ModelSerializer):
     """
@@ -522,25 +522,25 @@ class ReadGroupSerializer(BaseModelSerializer):
         model = Group
 
 
-class CustomAuthenticationBackend:
+# class CustomAuthenticationBackend:
 
-    def authenticate(self, email_or_username=None, password=None):
-        try:
-             user = User.objects.get(
-                 (email__iexact=email_or_username) | (username__iexact=email_or_username)
-             )
-             pwd_valid = user.check_password(password)
-             if pwd_valid:            
-                 return user
-             return None
-        except User.DoesNotExist:
-            return None
+#     def authenticate(self, email_or_username=None, password=None):
+#         try:
+#              user = User.objects.get(
+#                  (email__iexact=email_or_username) | (username__iexact=email_or_username)
+#              )
+#              pwd_valid = user.check_password(password)
+#              if pwd_valid:            
+#                  return user
+#              return None
+#         except User.DoesNotExist:
+#             return None
 
-    def get_user(self, user_id):
-        try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return None
+#     def get_user(self, user_id):
+#         try:
+#             return User.objects.get(pk=user_id)
+#         except User.DoesNotExist:
+#             return None
 
 
 class CustomLoginSerializer(serializers.Serializer):
