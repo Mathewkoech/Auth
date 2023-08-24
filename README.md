@@ -15,10 +15,7 @@ How to setup the project on your local machine
 
 7. create environment variables ".env" in project root
 8. Set your environment Variables as shown by .env.examples file
-9. Install Rabbitmq 
-10. Migrate migrations by:
+9. Migrate migrations by:
     python manage.py migrate
-10. Runserver by:
-    python manage.py runserver
-11. Access app via:
-    http://localhost:8000
+10. Runserver by:python manage.py runserver
+   
